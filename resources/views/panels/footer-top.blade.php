@@ -39,6 +39,14 @@
 <!-- main js -->
 <script src="assets/js/app.js"></script>
 
+
+
+
+{{-- datatable setup --}}
+<script>
+    let table = new DataTable('#dataTable');
+</script>
+
 <script>
 // ===================== Average Enrollment Rate Start =============================== 
 function createChartTwo(chartId, color1, color2) {
