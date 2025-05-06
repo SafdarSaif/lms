@@ -24,27 +24,28 @@ class UserController extends Controller
 {
   public function index(Request $request)
   {
-    $user = Auth::user();
-    if (Auth::check() && Auth::user()->hasPermissionTo('view users')) {
-      if ($request->ajax()) {
-
-        $data = User::orderBy('id', 'desc')->get();
-
-        return Datatables::of($data)
-          ->addIndexColumn()
-          ->addColumn('role', function ($data) {
-            $role = $data->getRoleNames();
-            return $role;
-          })
-          ->editColumn('created_at', function ($data) {
-            return Carbon::createFromFormat('Y-m-d H:i:s', $data->created_at)->format('d-m-Y h:i A');
-          })
-          ->make(true);
+      if (Auth::check() && Auth::user()->hasPermissionTo('view users')) {
+          if ($request->ajax()) {
+              $data = User::orderBy('id', 'desc')->get();
+  
+              return DataTables::of($data)
+                  ->addIndexColumn()
+                  ->addColumn('role', function ($user) {
+                      return $user->getRoleNames()->implode(', ');
+                  })
+                  ->editColumn('join_date', function ($user) {
+                      return $user->join_date ? Carbon::parse($user->join_date)->format('d-m-Y') : '-';
+                  })
+                  ->editColumn('created_at', function ($user) {
+                      return Carbon::parse($user->created_at)->format('d-m-Y h:i A');
+                  })
+                  ->make(true);
+          }
+  
+          return view('user.index');
       }
-      return view('user.index');
-    } else {
+  
       return response()->view('errors.403', [], 403);
-    }
   }
 
   public function create()

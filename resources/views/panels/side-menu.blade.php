@@ -64,7 +64,7 @@
             </li>
           </ul>
         </li>
-        <li class="sidebar-menu-group-title">Application</li>
+        {{-- <li class="sidebar-menu-group-title">Application</li>
         <li>
           <a href="email.html">
             <iconify-icon icon="mage:email" class="menu-icon"></iconify-icon>
@@ -283,7 +283,7 @@
             <iconify-icon icon="fe:vector" class="menu-icon"></iconify-icon>
             <span>Widgets</span> 
           </a>
-        </li>
+        </li> --}}
         <li class="dropdown">
           <a href="javascript:void(0)">
             <iconify-icon icon="flowbite:users-group-outline" class="menu-icon"></iconify-icon>
@@ -291,9 +291,9 @@
           </a>
           <ul class="sidebar-submenu">
             <li>
-              <a href="users-list.html"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i> Users List</a>
+              <a href="{{ route('users') }}"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i> Users List</a>
             </li>
-            <li>
+            {{-- <li>
               <a href="users-grid.html"><i class="ri-circle-fill circle-icon text-warning-main w-auto"></i> Users Grid</a>
             </li>
             <li>
@@ -304,7 +304,7 @@
             </li>
             <li>
               <a href="users-role-permission.html"><i class="ri-circle-fill circle-icon text-info-main w-auto"></i> User Role & Permission</a>
-            </li>
+            </li> --}}
           </ul>
         </li>
   
