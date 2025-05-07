@@ -24,28 +24,28 @@ class UserController extends Controller
 {
   public function index(Request $request)
   {
-      if (Auth::check() && Auth::user()->hasPermissionTo('view users')) {
-          if ($request->ajax()) {
-              $data = User::orderBy('id', 'desc')->get();
-  
-              return DataTables::of($data)
-                  ->addIndexColumn()
-                  ->addColumn('role', function ($user) {
-                      return $user->getRoleNames()->implode(', ');
-                  })
-                  ->editColumn('join_date', function ($user) {
-                      return $user->join_date ? Carbon::parse($user->join_date)->format('d-m-Y') : '-';
-                  })
-                  ->editColumn('created_at', function ($user) {
-                      return Carbon::parse($user->created_at)->format('d-m-Y h:i A');
-                  })
-                  ->make(true);
-          }
-  
-          return view('user.index');
+    if (Auth::check() && Auth::user()->hasPermissionTo('view users')) {
+      if ($request->ajax()) {
+        $data = User::orderBy('id', 'desc')->get();
+
+        return DataTables::of($data)
+          ->addIndexColumn()
+          ->addColumn('role', function ($user) {
+            return $user->getRoleNames()->implode(', ');
+          })
+          ->editColumn('join_date', function ($user) {
+            return $user->join_date ? Carbon::parse($user->join_date)->format('d-m-Y') : '-';
+          })
+          ->editColumn('created_at', function ($user) {
+            return Carbon::parse($user->created_at)->format('d-m-Y h:i A');
+          })
+          ->make(true);
       }
-  
-      return response()->view('errors.403', [], 403);
+
+      return view('user.index');
+    }
+
+    return response()->view('errors.403', [], 403);
   }
 
   public function create()
@@ -85,13 +85,21 @@ class UserController extends Controller
       }
 
       // Handle Avatar Upload
+      // if ($request->hasFile('avatar')) {
+      //   $avatarPath = $this->uploadImage($request->file('avatar'), 'uploads/avatars');
+      //   $user->update([
+      //     'avatar' => $avatarPath,
+      //     'profile_photo_path' => $avatarPath
+      //   ]);
+      // }
       if ($request->hasFile('avatar')) {
-        $avatarPath = $this->uploadImage($request->file('avatar'), 'uploads/avatars');
+        $avatarPath = uploadImage($request->file('avatar'), 'uploads/avatars');
         $user->update([
           'avatar' => $avatarPath,
           'profile_photo_path' => $avatarPath
         ]);
       }
+
 
 
 
@@ -130,68 +138,68 @@ class UserController extends Controller
 
   public function update(Request $request, $userId)
   {
-      // Validate input
-      $validated = $request->validate([
-          'name' => 'required|string|max:255',
-          'email' => 'required|email|unique:users,email,' . $userId,
-          'mobile' => 'required|digits:10|unique:users,mobile,' . $userId,
-          'password' => 'nullable|min:6',
-          'role_id' => 'nullable|exists:roles,id',
-          'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // Validate `avatar`
-      ]);
-  
-      try {
-          // Find user record
-          $user = User::findOrFail($userId);
-  
-          // Handle avatar upload (stored as `profile_photo_path`)
-          if ($request->hasFile('avatar')) {
-              // Delete old avatar if exists
-              if ($user->profile_photo_path && File::exists(public_path($user->profile_photo_path))) {
-                  File::delete(public_path($user->profile_photo_path));
-              }
-  
-              // Upload new avatar
-              $avatarPath = $this->uploadImage($request->file('avatar'), 'uploads/avatars');
-              $user->profile_photo_path = $avatarPath;
-          }
-  
-          // Update user details
-          $user->update([
-              'name' => $request->name,
-              'email' => $request->email,
-              'mobile' => $request->mobile,
-              'profile_photo_path' => $user->profile_photo_path, // Store as `profile_photo_path`
-          ]);
-  
-          // Update password if provided
-          if ($request->filled('password')) {
-              $user->update([
-                  'password' => Hash::make($request->password),
-              ]);
-          }
-  
-          // Assign new role if changed
-          if ($request->role_id) {
-              $role = Role::find($request->role_id);
-              if ($role) {
-                  $user->syncRoles([$role->id]);
-              }
-          }
-  
-          return response()->json([
-              'status' => 'success',
-              'message' => 'User updated successfully!',
-              'data' => $user
-          ], 200);
-      } catch (\Exception $e) {
-          return response()->json([
-              'status' => 'error',
-              'message' => 'Something went wrong: ' . $e->getMessage()
-          ], 500);
+    // Validate input
+    $validated = $request->validate([
+      'name' => 'required|string|max:255',
+      'email' => 'required|email|unique:users,email,' . $userId,
+      'mobile' => 'required|digits:10|unique:users,mobile,' . $userId,
+      'password' => 'nullable|min:6',
+      'role_id' => 'nullable|exists:roles,id',
+      'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // Validate `avatar`
+    ]);
+
+    try {
+      // Find user record
+      $user = User::findOrFail($userId);
+
+      // Handle avatar upload (stored as `profile_photo_path`)
+      if ($request->hasFile('avatar')) {
+        // Delete old avatar if exists
+        if ($user->profile_photo_path && File::exists(public_path($user->profile_photo_path))) {
+          File::delete(public_path($user->profile_photo_path));
+        }
+
+        // Upload new avatar
+        $avatarPath = $this->uploadImage($request->file('avatar'), 'uploads/avatars');
+        $user->profile_photo_path = $avatarPath;
       }
+
+      // Update user details
+      $user->update([
+        'name' => $request->name,
+        'email' => $request->email,
+        'mobile' => $request->mobile,
+        'profile_photo_path' => $user->profile_photo_path, // Store as `profile_photo_path`
+      ]);
+
+      // Update password if provided
+      if ($request->filled('password')) {
+        $user->update([
+          'password' => Hash::make($request->password),
+        ]);
+      }
+
+      // Assign new role if changed
+      if ($request->role_id) {
+        $role = Role::find($request->role_id);
+        if ($role) {
+          $user->syncRoles([$role->id]);
+        }
+      }
+
+      return response()->json([
+        'status' => 'success',
+        'message' => 'User updated successfully!',
+        'data' => $user
+      ], 200);
+    } catch (\Exception $e) {
+      return response()->json([
+        'status' => 'error',
+        'message' => 'Something went wrong: ' . $e->getMessage()
+      ], 500);
+    }
   }
-  
+
   // public function destroy($userId)
   // { {
   //         try {
@@ -205,27 +213,25 @@ class UserController extends Controller
 
   public function destroy($id)
   {
-      try {
-          $data = User::findOrFail($id);
-          if ($data) { 
-              User::find($id)->delete();
-              return response()->json([
-                  'status' => 'success',
-                  'message' => $data->name . ' Deleted successfully!',
-              ]);
-          } else {
-              return response()->json([
-                  'status' => 'error',
-                  'message' => 'Data not found',
-              ]);
-          }
-      } catch (\Exception $e) {
-          return response()->json([
-              'status' => 'error',
-              'message' => $e->getMessage(),
-          ]);
+    try {
+      $data = User::findOrFail($id);
+      if ($data) {
+        User::find($id)->delete();
+        return response()->json([
+          'status' => 'success',
+          'message' => $data->name . ' Deleted successfully!',
+        ]);
+      } else {
+        return response()->json([
+          'status' => 'error',
+          'message' => 'Data not found',
+        ]);
       }
+    } catch (\Exception $e) {
+      return response()->json([
+        'status' => 'error',
+        'message' => $e->getMessage(),
+      ]);
+    }
   }
-
-
 }

@@ -40,3 +40,11 @@
   <link rel="stylesheet" href="assets/css/lib/audioplayer.css">
   <!-- main css -->
   <link rel="stylesheet" href="assets/css/style.css">
+
+
+  {{-- CDN links --}}
+
+  {{-- <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" /> --}}
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+
+

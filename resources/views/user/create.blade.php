@@ -8,7 +8,7 @@
       <div class="col-md-6">
         <label class="form-label" for="name">Name</label>
         <input type="text" id="name" name="name" class="form-control" placeholder="Name" oninput="createInitials()"
-          autofocus>
+          >
       </div>
       <div class="col-md-6">
         <div class="row mb-2">
@@ -107,10 +107,10 @@
       }
     });
 
-    $("#role_id").select2({
-      placeholder: 'Choose',
-      dropdownParent: $('#modal-lg')
-    });
+    // $("#role_id").select2({
+    //   placeholder: 'Choose',
+    //   dropdownParent: $('#modal-lg')
+    // });
 
     $("#userAddForm").submit(function (e) {
       e.preventDefault();
@@ -130,7 +130,7 @@
             if (response.status == 'success') {
               toastr.success(response.message);
               $(".modal").modal('hide');
-              $('#users-table').DataTable().ajax.reload();
+              $('#users-datatable').DataTable().ajax.reload();
             } else {
               toastr.error(response.message);
             }
