@@ -26,7 +26,9 @@ Route::get('/table', function () {
     return view('content.table');
 })->name('content.table');
 
-
+Route::get('/portfolio', function () {
+    return view('portfolio.index');
+})->name('portfolio');
 
 
 // Users
